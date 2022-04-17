@@ -1,0 +1,38 @@
+<html>
+<head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" rel="stylesheet">
+<link href="/style.css" rel="stylesheet">
+<script src="/navlinks.js"></script>
+</head>
+<body>
+<nav>
+<div class='navbar'>
+  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+  <div class='flexible'></div>
+  <div><%=name%></div>
+  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+</div>
+<div class='navlinks'></div>
+</nav>
+<header>
+<h1><%=chain_name%> (<%=chain%>)</h1>
+<h2>chainId: <%=chainId%></h2>
+</header>
+<main>
+<form>
+<div class='list'>
+<% chains.forEach((chain, i) => { %>
+  <div class='item'>
+    <div>[<%=i%>] wallet path: <%=chain.path%></div>
+    <div class='address'><%=chain.address%></div>
+  </div>
+<% }) %>
+</div>
+</form>
+</main>
+<script>
+const links = navlinks(location.pathname)
+document.querySelector(".navlinks").innerHTML = links
+</script>
+</body>
+</html>

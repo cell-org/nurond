@@ -1,0 +1,102 @@
+<html>
+<head>
+<link href="/style.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js"></script>
+<script id="template" type="text/x-handlebars-template">
+<tr>
+  {{#each columns}}
+    <th>{{this}}</th>
+  {{/each}}
+</tr>
+{{#each values}}
+  <tr>
+    {{#each this}}
+      <td>{{this}}</td>
+    {{/each}}
+  </tr>
+{{/each}}
+</script>
+<script id="template2" type="text/x-handlebars-template">
+<img data-id="img-{{id}}">
+<h2>{{name}}</h2>
+</script>
+<script>
+class Loader {
+  async init() {
+    this.page = 0;
+    const sqlPromise = initSqlJs({
+      locateFile: file => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.wasm"//"/sql-wasm.wasm"
+    });
+    const dataPromise = fetch("<%=root_path%>/db.sqlite3").then(res => res.arrayBuffer());
+    console.log("load2 ")
+    const [SQL, buf] = await Promise.all([sqlPromise, dataPromise])
+    console.log("loaded")
+    this.db = new SQL.Database(new Uint8Array(buf));
+  }
+  next() {
+    const contents = this.db.exec(`SELECT * FROM tokens LIMIT 200 OFFSET ${this.page*200}`);
+    this.page++;
+    for(let val of contents[0].values) {
+      let div = document.createElement("div")
+      div.className = 'card'
+      div.setAttribute("data-id", val[2])
+      document.querySelector(".container").appendChild(div)
+      let id = div.getAttribute("data-id")
+      fetch("<%=root_path%>/fs/" + id).then((res) => {
+        return res.json()
+      }).then((res) => {
+        let cid = res.image.replace("ipfs://" , "")
+        let mime
+        if (res.mime) {
+          mime = res.mime[cid]
+        }
+        div.innerHTML = template2({
+          name: res.name,
+          description: res.description,
+        })
+        fetch("<%=root_path%>/fs/" + res.image.replace("ipfs://", "")).then((r) => {
+          return r.blob()
+        }).then((blob) => {
+          if (mime) {
+            blob = blob.slice(0, blob.size, mime)
+          }
+          document.querySelector(`[data-id=${id}] img`).src = URL.createObjectURL(blob);
+        })
+      })
+    }
+  }
+}
+const source = document.getElementById("template").innerHTML;
+const source2 = document.getElementById("template2").innerHTML;
+const template = Handlebars.compile(source);
+const template2 = Handlebars.compile(source2);
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("start")
+  const loader = new Loader()
+  await loader.init()
+  loader.next()
+  window.addEventListener('scroll',()=>{
+    console.log(window.scrollY) //scrolled from top
+    console.log(window.innerHeight) //visible part of screen
+    if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight){
+      loader.next()
+    }
+  })
+})
+</script>
+</head>
+<body>
+<nav>
+  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+  <a href="<%=file_path%>">files</a>
+  <div class='flexible'></div>
+  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+</nav>
+<main>
+<a class='btn' href="<%=path%>/view">Website View</a>
+<a class='btn' href="<%=path%>">File View</a>
+<div class='container'></div>
+</main>
+</body>
+</html>

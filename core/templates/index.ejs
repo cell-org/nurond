@@ -1,0 +1,178 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Sans-serif;
+  margin: 0;
+}
+nav {
+  padding: 100px 0;
+  text-align: center;
+}
+nav a {
+  font-family: georgia;
+  text-decoration: none;
+  color: black;
+  font-size: 50px;
+  font-weight: bold;
+  letter-spacing: -2px;
+}
+nav form {
+  margin: 0;
+}
+nav form #root {
+  width: 300px;
+}
+nav form input {
+  border: 1px solid rgba(0,0,0,0.2);
+  padding: 10px;
+  border-radius: 0;
+}
+.container {
+  font-family: Sans-serif;
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.container a {
+  text-decoration: none;
+  color: rgba(0,0,0,0.9);
+}
+.item {
+  padding: 10px;
+  box-sizing: border-box;
+  margin: 10px;
+  text-align: center;
+  flex-direction: column;
+  display: flex;
+  width: 200px;
+}
+.image {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.image img {
+  width: 100px;
+}
+h2 {
+  font-size: 15px;
+}
+svg {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+.btn {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-block;
+  margin: 10px 10px 10px 0;
+  text-decoration: none;
+  padding: 5px 15px;
+}
+.hidden {
+  display: none;
+}
+.loading {
+  font-size: 16px;
+}
+.name {
+  letter-spacing: -2px;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.1-rc.0/web3.min.js"></script>
+<script src="https://unpkg.com/c0js/dist/c0.js"></script>
+<script id="template" type="text/x-handlebars-template">
+<img data-id="img-{{id}}">
+<h2>{{name}}</h2>
+</script>
+<script>
+class Loader {
+  async init() {
+    this.page = 0;
+    const sqlPromise = initSqlJs({
+      locateFile: file => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.wasm"//"/sql-wasm.wasm"
+    });
+    const dataPromise = fetch("../db/mixtape.db").then(res => res.arrayBuffer());
+    const [SQL, buf] = await Promise.all([sqlPromise, dataPromise])
+    this.db = new SQL.Database(new Uint8Array(buf));
+    const web3 = new Web3(window.ethereum)
+    this.c0 = new C0()
+    this.c0.init({ web3, });
+  }
+  next() {
+    const contents = this.db.exec(`SELECT * FROM token LIMIT 200 OFFSET ${this.page*200}`);
+    let index = 0;
+    for(let column of contents[0].columns) {
+      if (column === "data") {
+        break;
+      }
+      index++;
+    }
+    this.page++;
+    for(let val of contents[0].values) {
+      let a = document.createElement("a")
+      a.className = 'item'
+      let meta_cid = val[4]
+      a.setAttribute("href", "token.html#cid=" + val[1] + "&meta=" + val[4])
+      a.setAttribute("data-tokencid", val[1])
+      a.setAttribute("data-id", val[4])
+      document.querySelector(".container").appendChild(a)
+      let id = a.getAttribute("data-id")
+      fetch("../fs/" + id).then((res) => {
+        return res.json()
+      }).then((res) => {
+        let cid = res.image.replace("ipfs://" , "")
+        let mime
+        if (res.mime) {
+          mime = res.mime[cid]
+        }
+        a.innerHTML = template({
+          name: res.name,
+          description: res.description,
+        })
+        fetch("../fs/" + res.image.replace("ipfs://", "")).then((r) => {
+          return r.blob()
+        }).then((blob) => {
+          if (mime) {
+            blob = blob.slice(0, blob.size, mime)
+          }
+          document.querySelector(`[data-id=${id}] img`).src = URL.createObjectURL(blob);
+        })
+      })
+    }
+  }
+}
+const source = document.getElementById("template").innerHTML;
+const template = Handlebars.compile(source);
+document.addEventListener("DOMContentLoaded", async () => {
+  const loader = new Loader()
+  await loader.init()
+  loader.next()
+  window.addEventListener('scroll',()=>{
+    if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight){
+      loader.next()
+    }
+  })
+})
+</script>
+</head>
+<body>
+<nav>
+  <a href="/"><%=domain.name%></a>
+</nav>
+<div class='container'></div>
+</body>
+</html>

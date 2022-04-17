@@ -1,0 +1,9 @@
+.env
+node_modules
+tissue
+tmp
+fs
+.DS_Store
+package-lock.json
+output.log
+nohup.out

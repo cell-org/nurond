@@ -1,0 +1,56 @@
+<html>
+<head>
+<link href="/style.css" rel="stylesheet">
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    let ok = confirm("Are you sure you want to delete the wallet?") 
+    if (ok) {
+      let res = await fetch("/wallet/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          password: document.querySelector("#password").value
+        })
+      }).then((res) => {
+        return res.json()
+      }).then((r) => {
+        if (r.error) {
+          alert(r.error)
+          location.reload()
+        } else {
+          alert("deleted!")
+          location.href = "/"
+        }
+      }).catch((e) => {
+        alert(e)
+        location.reload()
+      })
+    }
+  })
+})
+</script>
+</head>
+<body>
+<nav>
+<div class='navbar'>
+  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+  <div class='flexible'></div>
+  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+</div>
+</nav>
+<header>
+<h1>Delete Wallet</h1>
+</header>
+<div class='compact'>
+<form>
+  <input id='password' type='password' placeholder='enter decryption password'>
+  <input type='submit' value='export'>
+</form>
+</div>
+</body>
+</html>
