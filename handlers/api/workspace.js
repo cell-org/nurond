@@ -3,7 +3,6 @@ module.exports = (nuron) => {
   nuron.app.get("/config", async (req, res) => {
     try {
       nuron.config = await nuron.getConfig()
-      console.log("nuron>CONFIG", nuron.config)
       res.json({
         ipfs: { key: nuron.config.ipfs.key },
         workspace: {

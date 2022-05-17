@@ -9,7 +9,12 @@ const navlinks = (path) => {
       href: chunks.slice(0, i+1).join("/")
     })
   }
+  console.log("links", links)
   return links.map((link) => {
-    return `<a href="${link.href}">${link.name}</a>`
-  }).join("/")
+    if (link.name.length > 0) {
+      return `<a href="${link.href}">${link.name}</a>`
+    } else {
+      return "<span></span>"
+    }
+  }).join("<span>/</span>")
 }

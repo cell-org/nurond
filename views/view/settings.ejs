@@ -1,6 +1,6 @@
 <html>
 <head>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" rel="stylesheet">
+<link href="/css/all.min.css" rel="stylesheet">
 <link href="/style.css" rel="stylesheet">
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
@@ -19,16 +19,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 </head>
 <body>
 <nav>
-<div class='navbar'>
-  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
-  <div class='flexible'></div>
-  <div><%=name%></div>
-  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
-</div>
+  <div class='navbar'>
+    <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+    <div class='flexible'></div>
+    <div><%=name%></div>
+    <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+  </div>
+  <div class='navlinks'>
+    <span></span><span>/</span><span>settings</span>
+  </div>
 </nav>
-<header>
-  <h1>Settings</h1>
-</header>
 <main class='list'>
   <a class='item' href="/settings/wallet">wallet settings</a>
   <a class='item' href="/settings/workspaces">workspace settings</a>

@@ -33,10 +33,4 @@ module.exports = (nuron) => {
   nuron.app.get("/wallet/import", async (req, res) => {
     res.render("wallet/import")
   })
-  nuron.app.get("/wallet/export", async (req, res) => {
-    res.render("wallet/export")
-  })
-  nuron.app.get("/wallet/delete", async (req, res) => {
-    res.render("wallet/delete")
-  })
 }

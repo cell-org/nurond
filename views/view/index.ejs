@@ -1,8 +1,8 @@
 <html>
 <head>
 <link href="/style.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js"></script>
+<script src="/handlebars.min.js"></script>
+<script src="/sql-wasm.js"></script>
 <script id="template" type="text/x-handlebars-template">
 <tr>
   {{#each columns}}
@@ -26,7 +26,8 @@ class Loader {
   async init() {
     this.page = 0;
     const sqlPromise = initSqlJs({
-      locateFile: file => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.wasm"//"/sql-wasm.wasm"
+      //locateFile: file => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.wasm"//"/sql-wasm.wasm"
+      locateFile: file => "/sql-wasm.wasm"
     });
     const dataPromise = fetch("<%=root_path%>/db.sqlite3").then(res => res.arrayBuffer());
     console.log("load2 ")

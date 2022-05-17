@@ -58,4 +58,10 @@ module.exports = (nuron) => {
       res.redirect("/")
     }
   })
+  nuron.app.get("/settings/wallet/export", async (req, res) => {
+    res.render("wallet/export")
+  })
+  nuron.app.get("/settings/wallet/delete", async (req, res) => {
+    res.render("wallet/delete")
+  })
 }

@@ -2,20 +2,26 @@ const fs = require('fs')
 const Path = require('path')
 const ejs = require('ejs')
 const git = require('isomorphic-git')
+const fetch = require('cross-fetch')
 const exists = path => fs.promises.stat(path).then(() => true, () => false);
 class Web {
   constructor(core) {
     this.core = core
   }
   async build(o) {
-    /*
-    o := {
-      workspace,
-      domain,
-      path,
-      config
-    }
-    */
+    //  o := {
+    //    templates: [{
+    //      src: <index.ejs url>,
+    //      dest: "index.html"
+    //    }, {
+    //      src: <token.ejs url>,
+    //      dest: "token.html"
+    //    }],
+    //    workspace: <workspace path>,
+    //    domain: <domain>,
+    //    path:   <file path>,
+    //    config: <config>
+    //  }
     const rootPath = Path.resolve(this.core.path, o.workspace, o.path)
 
     let e = await exists(rootPath)
@@ -24,11 +30,39 @@ class Web {
       await git.init({ fs, dir: Path.resolve(this.core.path, o.workspace) }).catch((e) => {})
     }
 
-    const index = await ejs.renderFile(__dirname + "/templates/index.ejs", { domain: o.domain, config: o.config }, { async: true })
-    const token = await ejs.renderFile(__dirname + "/templates/token.ejs", { domain: o.domain, config: o.config }, { async: true })
-    // => Rendered HTML string
-    await fs.promises.writeFile(Path.resolve(this.core.path, o.workspace, o.path, "index.html"), index).catch((e) => {})
-    await fs.promises.writeFile(Path.resolve(this.core.path, o.workspace, o.path, "token.html"), token).catch((e) => {})
+    let templates = [{
+      src: __dirname + "/templates/index.ejs",
+      dest: "index.html"
+    }, {
+      src: __dirname + "/templates/token.ejs",
+      dest: "token.html"
+    }]
+
+    // custom templates
+    if (o.templates && Array.isArray(o.templates)) {
+      templates = o.templates
+    }
+
+    for(let template of templates) {
+      // if src starts with http => download first
+      let html
+      if (template.src.startsWith("http")) {
+        let tpl = await fetch(template.src).then((r) => {
+          return r.text()
+        })
+        html = await ejs.render(tpl, { domain: o.domain, config: o.config }, { async: true })
+      } else {
+        html = await ejs.renderFile(template.src, { domain: o.domain, config: o.config }, { async: true })
+      }
+
+      await fs.promises.writeFile(Path.resolve(this.core.path, o.workspace, o.path, template.dest), html).catch((e) => {})
+//      await fs.promises.copyFile(
+//        __dirname + "/templates/c0.js",
+//        Path.resolve(this.core.path, o.workspace, o.path, "c0.js")
+//      )
+
+    }
+
   }
 }
 module.exports = Web

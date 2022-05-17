@@ -37,19 +37,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 </head>
 <body>
 <nav>
-<div class='navbar'>
-  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
-  <div class='flexible'></div>
-  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
-</div>
+  <div class='navbar'>
+    <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+    <div class='flexible'></div>
+    <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+  </div>
+  <div class='navlinks'>
+    <span></span><span>/</span><a href="..">settings</a><span>/</span><a href=".">wallet</a><span>/</span><span>delete</span>
+  </div>
 </nav>
-<header>
-<h1>Delete Wallet</h1>
-</header>
 <div class='compact'>
 <form>
+  <h5>Delete the current wallet</h5>
   <input id='password' type='password' placeholder='enter decryption password'>
-  <input type='submit' value='export'>
+  <input type='submit' value='delete'>
 </form>
 </div>
 </body>

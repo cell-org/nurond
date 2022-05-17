@@ -1,23 +1,23 @@
 <html>
 <head>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" rel="stylesheet">
+<link href="/css/all.min.css" rel="stylesheet">
 <link href="/style.css" rel="stylesheet">
 </head>
 <body>
 <nav>
-<div class='navbar'>
-  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
-  <div class='flexible'></div>
-  <div><%=name%></div>
-  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
-</div>
+  <div class='navbar'>
+    <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+    <div class='flexible'></div>
+    <div><%=name%></div>
+    <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+  </div>
+  <div class='navlinks'>
+    <span></span><span>/</span><a href=".">settings</a><span>/</span><span>wallet</span>
+  </div>
 </nav>
-<header>
-  <h1>Settings</h1>
-</header>
 <main class='list'>
-  <a class='item' href="/wallet/export">export wallet</a>
-  <a class='item' href="/wallet/delete">delete wallet</a>
+  <a class='item' href="/settings/wallet/export">export wallet</a>
+  <a class='item' href="/settings/wallet/delete">delete wallet</a>
 </main>
 </body>
 </html>

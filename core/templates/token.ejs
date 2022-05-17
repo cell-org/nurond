@@ -18,11 +18,14 @@ nav a {
   font-weight: bold;
   letter-spacing: -2px;
 }
+#content {
+  width: 100%;
+}
 .container {
   font-family: Sans-serif;
   font-size: 12px;
   display: block;
-  max-width: 500px;
+  max-width: 800px;
   width: 100%;
   margin: 20px auto;
 }
@@ -85,6 +88,15 @@ hr {
   overflow-wrap: break-word;
   margin-bottom: 20px;
 }
+.error {
+  text-align: center;
+  opacity: 0.2;
+}
+iframe {
+  border: none;
+  width: 100%;
+  height: 400px;
+}
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
@@ -114,7 +126,7 @@ hr {
     <i class="fa-bounce fa-solid fa-cube"></i> minting...
   </div>
 </div>
-<img>
+{{{content}}}
 <hr>
 <div>{{{table}}}</div>
 </script>
@@ -174,7 +186,11 @@ const renderAttributes = (a) => {
 document.addEventListener("DOMContentLoaded", async () => {
   const web3 = new Web3(window.ethereum)
   const c0 = new C0()
-  await c0.init({ web3, });
+  try {
+    await c0.init({ web3, });
+  } catch (e) {
+    document.querySelector(".container").innerHTML = "<h2 class='error'>Please connect to a browser wallet</h2>"
+  }
 
 
   const [token, meta] = await Promise.all([Params.cid, Params.meta].map((i) => {
@@ -190,11 +206,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let royalty = await c0.token.methods(token.domain.verifyingContract).royalty(token.body.id).call()
 
-  let cid = meta.image.replace("ipfs://" , "")
   let mime
-  if (meta.mime) {
-    mime = meta.mime[cid]
+  let tag
+  let src
+  if (meta.animation_url) {
+    src = meta.animation_url
+    let cid = meta.animation_url.replace("ipfs://" , "")
+    let srcpath = "../fs/" + cid
+    if (meta.mime) {
+      mime = meta.mime[cid]
+    }
+    if (mime.startsWith("video")) {
+      tag = `<video controls id='content'><source src="${srcpath}" type="${mime}"></video>`
+    } else if (mime.startsWith("audio")) {
+      tag = `<audio controls id='content'><source src="${srcpath}" type="${mime}"></audio>`
+    } else {
+      tag = `<iframe src="${srcpath}"></iframe>`
+    }
+  } else if (meta.image) {
+    src = meta.image
+    let cid = meta.image.replace("ipfs://" , "")
+    let srcpath = "../fs/" + cid
+    if (meta.mime) {
+      mime = meta.mime[cid]
+    }
+    if (mime === "image/svg+xml") {
+      tag = "<img id='content'>"
+    } else {
+      tag = `<img id='content' src="${srcpath}">`
+    }
   }
+
   document.querySelector("#meta").innerHTML = metaTemplate({
     name: meta.name,
     description: meta.description,
@@ -203,7 +245,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     mainnet: (token.domain.chainId === 1),
     address: token.domain.verifyingContract,
     tokenId: token.body.id,
-    table: render(meta)
+    table: render(meta),
+    content: tag,
   })
   if (owner) {
     document.querySelector("#owner").classList.remove("hidden")
@@ -212,14 +255,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   <% if (config && config.token && config.token.info) { %>
   document.querySelector("#token").innerHTML = render(token)
   <% } %>
-  fetch("../fs/" + meta.image.replace("ipfs://", "")).then((r) => {
-    return r.blob()
-  }).then((blob) => {
-    if (mime) {
-      blob = blob.slice(0, blob.size, mime)
-    }
-    document.querySelector(`.container img`).src = URL.createObjectURL(blob);
-  })
+
+  if (mime === "image/svg+xml") {
+    // SVG is special case scenario
+    fetch("../fs/" + src.replace("ipfs://", "")).then((r) => {
+      return r.blob()
+    }).then((blob) => {
+      if (mime) {
+        blob = blob.slice(0, blob.size, mime)
+      }
+      document.querySelector(`#content`).src = URL.createObjectURL(blob);
+    })
+  }
+
 
   document.querySelector("#mint").addEventListener("click", async (e) => {
     let proof = {}
@@ -232,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       document.querySelector(".loading").classList.remove("hidden")
       document.querySelector("#mint").classList.add("hidden")
-      let tx = await c0.token.mint([token], [proof])
+      let tx = await c0.token.send([token], [proof])
       console.log(tx)
       location.reload()
     } catch (e) {

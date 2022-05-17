@@ -7,3 +7,5 @@ fs
 package-lock.json
 output.log
 nohup.out
+__keyport__
+__nuron__

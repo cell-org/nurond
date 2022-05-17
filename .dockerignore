@@ -6,3 +6,6 @@ package-lock.json
 .git
 test
 demo
+__keyport__
+__nuron__
+fs

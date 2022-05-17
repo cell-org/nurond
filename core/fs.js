@@ -1,13 +1,10 @@
 const ipfsh = require('ipfsh')
-const copy = require('recursive-copy');
-const axios = require('axios')
 const fs = require('fs')
 const Path = require('path')
 const Pinster = require('pinster')
 const git = require('isomorphic-git')
 const stringify = require('json-stringify-deterministic')
 const exists = path => fs.promises.stat(path).then(() => true, () => false);
-
 class FS {
   constructor(core) {
     this.core = core

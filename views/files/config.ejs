@@ -1,14 +1,18 @@
 <html>
 <head>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" rel="stylesheet">
+<link href="/css/all.min.css" rel="stylesheet">
 <link href="/style.css" rel="stylesheet">
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
+  document.querySelector("#key").addEventListener("input", async (e) => {
+    document.querySelector("#save").classList.remove("disabled")
+    document.querySelector("#save").value = "save"
+  })
   document.querySelector("form").addEventListener("submit", async (e) => {
     e.preventDefault()
     e.stopPropagation()
     let key = document.querySelector("#key").value
-    let res = await fetch("/fs/configure", {
+    let res = await fetch("/configure", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -19,7 +23,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).then((res) => {
       return res.json()
     })
-    location.reload()
+    document.querySelector("#save").classList.add("disabled")
+    document.querySelector("#save").value = "saved"
+//    location.reload()
   })
 })
 </script>
@@ -32,15 +38,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   <div><%=name%></div>
   <a href="/settings"><i class="fa-solid fa-gear"></i></a>
 </div>
+  <div class='navlinks'>
+    <span></span><span>/</span><a href=".">settings</a><span>/</span><span>workspaces</span>
+  </div>
 </nav>
-<header>
-  <h1>File System Settings</h1>
-</header>
 <main>
 <div class='compact'>
+  <h5>Set NFT.STORAGE API KEY</h5>
   <form>
     <textarea placeholder="nft.storage API key" id='key'><%=ipfs.key%></textarea>
-    <input type='submit' value='save' class='btn'>
+    <input type='submit' value='save' class='btn' id='save'>
   </form>
 </div>
 </main>

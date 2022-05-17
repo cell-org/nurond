@@ -39,6 +39,7 @@ nav form input {
 .container a {
   text-decoration: none;
   color: rgba(0,0,0,0.9);
+  border: 1px solid rgba(0,0,0,0.1);
 }
 .item {
   padding: 10px;
@@ -56,8 +57,12 @@ nav form input {
   box-sizing: border-box;
   text-align: center;
 }
-.image img {
-  width: 100px;
+img.empty {
+  background: whitesmoke;
+  color: gray;
+  height: 100px;
+  border: none;
+  color: black;
 }
 h2 {
   font-size: 15px;
@@ -134,23 +139,28 @@ class Loader {
       fetch("../fs/" + id).then((res) => {
         return res.json()
       }).then((res) => {
-        let cid = res.image.replace("ipfs://" , "")
-        let mime
-        if (res.mime) {
-          mime = res.mime[cid]
-        }
         a.innerHTML = template({
+          id,
           name: res.name,
           description: res.description,
         })
-        fetch("../fs/" + res.image.replace("ipfs://", "")).then((r) => {
-          return r.blob()
-        }).then((blob) => {
-          if (mime) {
-            blob = blob.slice(0, blob.size, mime)
+        if (res.image) {
+          let cid = res.image.replace("ipfs://" , "")
+          let mime
+          if (res.mime) {
+            mime = res.mime[cid]
           }
-          document.querySelector(`[data-id=${id}] img`).src = URL.createObjectURL(blob);
-        })
+          fetch("../fs/" + res.image.replace("ipfs://", "")).then((r) => {
+            return r.blob()
+          }).then((blob) => {
+            if (mime) {
+              blob = blob.slice(0, blob.size, mime)
+            }
+            document.querySelector(`img[data-id=img-${id}]`).src = URL.createObjectURL(blob);
+          })
+        } else {
+          document.querySelector(`img[data-id=img-${id}]`).setAttribute("class", "empty")
+        }
       })
     }
   }

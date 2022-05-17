@@ -2,7 +2,6 @@ const fs = require('fs')
 const Knex = require('knex')
 const Path = require('path')
 const C0 = require('c0js')
-const Query = require("./query")
 class Token {
   constructor(core) {
     this.core = core
