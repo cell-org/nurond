@@ -6,6 +6,7 @@ const mime = require('mime-types')
 const path = require('path')
 const Web3 = require('web3')
 const os = require('os')
+const Config = require('./config')
 const Core = require('./core')
 const FormData = require('form-data')
 const sigUtil = require('@metamask/eth-sig-util')
@@ -86,8 +87,8 @@ class Nuron {
     // Initialize App
     this.app = express()
     this.port = options && options.port ? options.port : 42000
-    this.app.use(cors())
-    this.app.options('*', cors())
+    this.app.use(cors(Config.cors))
+    this.app.options('*', cors(Config.cors))
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(express.json())
     this.app.set('view engine', 'ejs');
