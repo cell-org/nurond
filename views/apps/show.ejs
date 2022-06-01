@@ -1,0 +1,44 @@
+<html>
+<head>
+<link href="/css/all.min.css" rel="stylesheet">
+<script src="/navlinks.js"></script>
+<link href="/style.css" rel="stylesheet">
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const links = navlinks(location.pathname)
+  document.querySelector(".navlinks").innerHTML = links
+})
+</script>
+</head>
+<body>
+<nav>
+<div class='navbar'>
+  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+  <div class='flexible'></div>
+  <div><%=name%></div>
+  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+</div>
+<div class='navlinks'></div>
+</nav>
+</header>
+<main>
+<div class='topbar'>
+  <h3>How it works</h3>
+  <div>You can install any web app into nuron, which lets you SECURELY interact with the website OFFLINE.</div>
+  <br>
+  <div>1. Create a file named <code>nuron.json</code> in the root folder, with a "path" attribute (This will tell Nuron which path to serve assets from):</div>
+  <pre>{
+  "path": "public"
+}</pre>
+  <div>2. Publish to a public git repository (like GitHub)</div>
+  <div>3. Enter the URL below to download. That's it!</div>
+</div>
+<div class='download'>
+  <form method="post" action="/install">
+    <input name='git' id='url' type="url" placeholder="git url" value="<%=git%>">
+    <input type="submit" value="install">
+  </form>
+</div>
+</main>
+</body>
+</html>

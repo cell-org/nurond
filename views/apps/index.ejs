@@ -1,0 +1,70 @@
+<html>
+<head>
+<link href="/css/all.min.css" rel="stylesheet">
+<script src="/navlinks.js"></script>
+<link href="/style.css" rel="stylesheet">
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const links = navlinks(location.pathname)
+  document.querySelector(".navlinks").innerHTML = links
+  document.querySelector(".list").addEventListener("click", async (e) => {
+
+    // get the data-hex
+    let btn = (e.target.classList.contains("del")) ? e.target : e.target.closest(".del")
+    if (btn) {
+      e.preventDefault()
+      e.stopPropagation()
+      let c = confirm("this will delete the app from nuron. continue?")
+      if (c) {
+        let res = await fetch("/uninstall", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            git: btn.getAttribute("data-url")
+          })
+        }).then((res) => {
+          return res.json()
+        })
+        location.reload()
+      }
+    }
+
+  })
+})
+</script>
+</head>
+<body>
+<nav>
+<div class='navbar'>
+  <a class='brand' href="/"><img class='mini' src="/nuron.png"></a>
+  <div class='flexible'></div>
+  <div><%=name%></div>
+  <a href="/settings"><i class="fa-solid fa-gear"></i></a>
+</div>
+<div class='navlinks'></div>
+</nav>
+</header>
+<main>
+<div class='topbar'>
+  <h3>Apps</h3>
+  <div>Install offline websites to Nuron.</div>
+  <a class='btn' href="/install">+ Install</a>
+</div>
+<div class='list'>
+<% apps.forEach((app) => { %>
+  <div class='item'>
+    <h3><i class='fa-solid fa-gamepad'></i> <%=app.hex%></h3>
+    <div class='l'><%=app.original%></div>
+    <div class='actions'>
+      <a target="_blank" class='action-btn' href="/apps/<%=app.hex%>/index.html"><i class="fa-solid fa-power-off"></i> Open</a>
+      <div class='flexible'></div>
+      <button data-url="<%=app.original%>" class='action-btn warning del'><i class="fa-solid fa-trash-can"></i> delete</button>
+    </div>
+  </div>
+<% }) %>
+</div>
+</main>
+</body>
+</html>

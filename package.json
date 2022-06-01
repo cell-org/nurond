@@ -1,6 +1,6 @@
 {
   "name": "nurond",
-  "version": "0.0.18",
+  "version": "0.0.26",
   "description": "",
   "main": "index.js",
   "author": "skogard",
@@ -18,7 +18,7 @@
     "ejs": "^3.1.7",
     "express": "^4.17.2",
     "ipfsh": "^0.0.6",
-    "isomorphic-git": "^1.13.1",
+    "isomorphic-git": "^1.17.2",
     "json-stringify-deterministic": "^1.0.5",
     "keyport": "^0.0.13",
     "kill-port-process": "^3.0.1",

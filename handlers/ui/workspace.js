@@ -14,6 +14,7 @@ module.exports = (nuron) => {
         let isDirectory = file.isDirectory()
         return {
           current: "/workspaces",
+          icon: "fa-solid fa-folder-open",
           name: file.name,
           type: (isFile ? "file" : (isDirectory ? "directory" : null))
         }

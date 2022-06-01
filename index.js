@@ -24,6 +24,7 @@ const Handlers = {
     wallet: require('./handlers/ui/wallet'),
     main: require('./handlers/ui/main'),
     workspace: require('./handlers/ui/workspace'),
+    apps: require('./handlers/ui/apps'),
   }
 }
 /*******************************
@@ -107,6 +108,7 @@ class Nuron {
     Handlers.ui.wallet(this)
     Handlers.ui.workspace(this)
     Handlers.ui.main(this)
+    Handlers.ui.apps(this)
 
     this.server = this.app.listen(this.port)
   }

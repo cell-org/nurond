@@ -4,6 +4,7 @@
         url('visitor1-webfont.woff') format('woff');
 }
 body {
+  background: rgba(0,0,0,0.9);
   margin: 0;
   font-family: sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -26,9 +27,7 @@ body.fit iframe {
   width: 100%;
   height: 100%;
   border: none;
-  /*
   background: white;
-  */
 }
 #logo {
   text-align: center;
@@ -40,12 +39,21 @@ body.fit iframe {
   height: 20px;
 }
 header {
+  color: rgba(255,255,255,0.8);
   padding: 20px;
 }
 .navbar {
   display: flex;
   align-items: stretch;
+  /*
   background: gold;
+  */
+  /*
+  background: rgba(57, 67, 183, 0.05);
+  */
+  background: #1A1A20;
+
+  color: white;
   padding-top: 20px;
 }
 .disabled {
@@ -53,14 +61,16 @@ header {
 }
 nav {
   align-items: center;
-  background: white;
   top: 0;
   position: sticky;
   -webkit-app-region: drag;
   cursor: grab;
 }
 .navbar > * {
+/*
   color: rgba(0,0,0,0.8);
+  */
+  color: rgba(255,255,255,0.8);
   padding: 20px;
   display: block;
   /*
@@ -68,7 +78,14 @@ nav {
   background: none;
   */
   border: none;
+  /*
   font-size: 14px;
+  */
+  /*
+  font-family: Menlo, monaco, monospace;
+  */
+  font-size: 14px;
+  letter-spacing: -1px;
 }
 nav a {
   text-decoration: none;
@@ -78,7 +95,10 @@ nav a {
   color: #976d3f;
   color: yellowgreen;
   */
+  /*
   color: rgba(0,0,0,0.8);
+  */
+  color: yellowgreen;
 }
 .flexible {
   flex-grow: 1;
@@ -94,7 +114,7 @@ nav a {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: gold;
+  background: #1A1A20;
   -webkit-app-region: drag;
   /*
   background: #231f20;
@@ -132,7 +152,7 @@ form input[type=submit] {
   background: yellowgreen;
   */
   color: white;
-  background: rgba(0,0,0,0.8);
+  background: royalblue;
   border: none;
   font-weight: bold;
 }
@@ -145,7 +165,10 @@ form input[type=submit] {
 .list .item {
   text-decoration: none;
   padding: 10px;
+  /*
   color: rgba(0,0,0,0.8);
+  */
+  color: rgba(255,255,255,0.8);
   /*
   color: rgba(0,0,0,0.7);
   color: rgba(255,255,255,0.7);
@@ -155,13 +178,24 @@ form input[type=submit] {
   border-left: 10px solid #976d3f;
   border-left: 10px solid yellowgreen;
   */
-  /*
   border-left: 10px solid royalblue;
-  */
+  /*
   border-left: 10px solid gold;
+  */
+  /*
+  font-family: Menlo, monaco, monospace;
+  */
 
   display: block;
   font-size: 14px;
+}
+.item h3 {
+  font-family: Sans-serif;
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+.item .l {
+  color: royalblue;
 }
 .list .row {
   display: flex;
@@ -169,7 +203,12 @@ form input[type=submit] {
   align-items: center;
 }
 .list .item i {
-  width: 20px;
+  width: 18px;
+  text-align: center;
+  font-size: 18px;
+  margin-right: 5px;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 /*
 .list .item:nth-child(odd) {
@@ -201,8 +240,9 @@ a {
 /*
   color: #976d3f;
   color: yellowgreen;
-  */
   color: firebrick;
+  */
+  color: royalblue;
   text-decoration: none;
   display: block;
 }
@@ -236,6 +276,8 @@ a {
   color: white;
   */
   display: flex;
+  overflow-wrap: break-word;
+
 }
 .image {
   padding: 20px;
@@ -292,14 +334,20 @@ hr {
 .navlinks {
   color: white;
   position: sticky;
+  background: #1B1C22;
   top: 0;
+  /*
   background: firebrick;
+  */
   cursor: default;
 }
 .navlinks > * {
-  padding: 10px 5px;
+/*
+  font-family: Menlo, monaco, monospace;
+  */
+  font-size: 14px;
+  padding: 10px 3px;
   display: inline-block;
-  font-size: 18px;
   font-weight: bold;
 }
 .navlinks a {
@@ -310,5 +358,71 @@ hr {
   color: yellowgreen;
   color: royalblue;
   */
+  /*
   color: gold;
+  */
+  color: royalblue;
+}
+.download {
+  padding: 20px;
+}
+h3 {
+  margin: 0;
+}
+.actions {
+  padding: 10px 0 0;
+  display: flex;
+}
+.list .item .action-btn.warning {
+  background: none;
+  color: firebrick;
+}
+.list .item .action-btn i {
+  margin: 0;
+  vertical-align: baseline;
+  font-size: 14px;
+  width: 14px;
+}
+.list .item .action-btn {
+  cursor: pointer;
+  text-transform: uppercase;
+  padding: 10px;
+  width: 120px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 2px;
+  background: royalblue;
+  color: white;
+  margin-right: 10px;
+  border: none;
+  display: inline-block;
+  font-family: Sans-serif;
+}
+.topbar {
+  padding: 40px;
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+}
+.topbar h3 {
+  font-size: 30px;
+  letter-spacing: -1px;
+}
+.topbar code {
+  background: rgba(255,255,255,0.1);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+.topbar .btn {
+  margin: 10px 0 0 0;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 5px 40px;
+}
+.topbar pre {
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  box-sizing: border-box;
 }
