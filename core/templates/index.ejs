@@ -107,35 +107,46 @@ svg {
 class Loader {
   async init() {
     this.page = 0;
+
+    // SQL.JS INIT
     const sqlPromise = initSqlJs({
       locateFile: file => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.wasm"//"/sql-wasm.wasm"
     });
     const dataPromise = fetch("../db/mixtape.db").then(res => res.arrayBuffer());
     const [SQL, buf] = await Promise.all([sqlPromise, dataPromise])
     this.db = new SQL.Database(new Uint8Array(buf));
+
+    // Web3 INIT
     const web3 = new Web3(window.ethereum)
+
+    // C0 INIT
     this.c0 = new C0()
     this.c0.init({ web3, });
   }
   next() {
+    // In-browser SQL Query via SQL.JS
     const contents = this.db.exec(`SELECT * FROM token LIMIT 200 OFFSET ${this.page*200}`);
-    let index = 0;
-    for(let column of contents[0].columns) {
-      if (column === "data") {
-        break;
-      }
-      index++;
-    }
+
+    // Increment the page
     this.page++;
+
+    // Render the result
     for(let val of contents[0].values) {
+
+      // Each item is wrapped in an "<a>" tag
       let a = document.createElement("a")
       a.className = 'item'
       let meta_cid = val[4]
       a.setAttribute("href", "token.html#cid=" + val[1] + "&meta=" + val[4])
       a.setAttribute("data-tokencid", val[1])
       a.setAttribute("data-id", val[4])
+
+      // Append the A tag to the container
       document.querySelector(".container").appendChild(a)
+
+      // Load metadata and fill the item (The "a" tags are already included in the container)
       let id = a.getAttribute("data-id")
+      // Fetch metadata
       fetch("../fs/" + id).then((res) => {
         return res.json()
       }).then((res) => {
@@ -144,6 +155,7 @@ class Loader {
           name: res.name,
           description: res.description,
         })
+        // If there's an "image" attribute in the metadata, load the image data and fill the image element
         if (res.image) {
           let cid = res.image.replace("ipfs://" , "")
           let mime
@@ -168,9 +180,11 @@ class Loader {
 const source = document.getElementById("template").innerHTML;
 const template = Handlebars.compile(source);
 document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize loader and load the first page
   const loader = new Loader()
   await loader.init()
   loader.next()
+  // Infinite scroll logic
   window.addEventListener('scroll',()=>{
     if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight){
       loader.next()

@@ -7,12 +7,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelector("#disconnect").addEventListener("click", async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    let res = await fetch("/wallet/disconnect", {
-      method: "POST",
-    }).then((res) => {
-      return res.json()
-    })
-    location.reload()
+    let c = confirm("log out?")
+    if (c) {
+      let res = await fetch("/wallet/disconnect", {
+        method: "POST",
+      }).then((res) => {
+        return res.json()
+      })
+      location.reload()
+    }
   })
 })
 </script>
@@ -32,7 +35,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 <main class='list'>
   <a class='item' href="/settings/wallet">wallet settings</a>
   <a class='item' href="/settings/workspaces">workspace settings</a>
-  <hr>
   <a class='item' href="#" id='disconnect'>logout</a>
 </main>
 </body>

@@ -7,6 +7,24 @@
 document.addEventListener("DOMContentLoaded", () => {
   const links = navlinks(location.pathname)
   document.querySelector(".navlinks").innerHTML = links
+  document.querySelector("#trash").addEventListener("click", async (e) => {
+    let path = document.querySelector("#trash").getAttribute("data-path")
+    let workspace = document.querySelector("#trash").getAttribute("data-workspace")
+    let c = confirm("delete?")
+    if (c) {
+      let res = await fetch("/fs/rm2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workspace,
+          paths: path
+        })
+      }).then((res) => {
+        return res.json()
+      })
+      location.href = "."
+    }
+  })
 })
 </script>
 </head>
@@ -18,7 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
   <div><%=name%></div>
   <a href="/settings"><i class="fa-solid fa-gear"></i></a>
 </div>
-<div class='navlinks'></div>
+<div class='h'>
+  <div class='navlinks'></div>
+  <div class='flexible'></div>
+  <button id='trash' data-workspace="<%=workspace%>" data-path="<%=current%>"><i class="fa-solid fa-trash-can"></i></button>
+</div>
 </nav>
 </header>
 <iframe src="<%=url%>"></iframe>

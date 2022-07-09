@@ -74,5 +74,25 @@ class FS {
       }
     }
   }
+  async rm2(path, paths) {
+    console.log("path", path)
+    console.log("paths", paths)
+    if (Array.isArray(paths)) {
+      for(let p of paths) {
+        const resolvedPath = Path.resolve(this.core.path, path, p)
+        await fs.promises.rm(resolvedPath, { recursive: true, force: true })
+      }
+    } else {
+      if (paths === "*") {
+        const resolvedPath = Path.resolve(this.core.path, path)
+        console.log("resolvedPath", resolvedPath)
+        await fs.promises.rm(resolvedPath, { recursive: true, force: true }).catch((e) => { console.log("error", e) })
+//        await fs.promises.mkdir(resolvedPath, { recursive: true }).catch((e) => {})
+      } else {
+        const resolvedPath = Path.resolve(this.core.path, path, paths)
+        await fs.promises.rm(resolvedPath, { recursive: true, force: true })
+      }
+    }
+  }
 }
 module.exports = FS

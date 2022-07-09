@@ -123,10 +123,12 @@ header:empty {
     <div>
       {{#if rinkeby}}
         <a class='btn' href="https://testnets.opensea.io/assets/{{address}}/{{tokenId}}" target="_blank">Opensea</a>
+        <a class='btn' href="https://rinkeby.looksrare.org/collections/{{address}}/{{tokenId}}" target="_blank">Looksrare</a>
         <a class='btn' href="https://rinkeby.rarible.com/token/{{address}}:{{tokenId}}" target="_blank">Rarible</a>
       {{else}}
         {{#if mainnet}}
           <a class='btn' href="https://opensea.io/assets/{{address}}/{{tokenId}}" target="_blank">Opensea</a>
+          <a class='btn' href="https://looksrare.org/collections/{{address}}/{{tokenId}}" target="_blank">Looksrare</a>
           <a class='btn' href="https://rarible.com/token/{{address}}:{{tokenId}}" target="_blank">Rarible</a>
         {{/if}}
       {{/if}}
@@ -142,7 +144,15 @@ header:empty {
 <div>{{{table}}}</div>
 </script>
 <script>
-const metaTemplate = Handlebars.compile(document.querySelector("#meta-template").innerHTML)
+
+// Parse the URL hash parameters
+// 
+// [Example]
+// http://localhost:42000/raw/PPP/web/token.html#cid=bafkreifschsbgf627zbccvqjzd7whu6wpwru6brwlq44f7yhtzycqp5rqe&meta=bafkreifgbvkjf2vsdelf3lvdtbkvxb6e6e5o5npack3i43rqnzbw6zffwi
+//
+//  - cid: "bafkreifschsbgf627zbccvqjzd7whu6wpwru6brwlq44f7yhtzycqp5rqe"
+//  - meta "bafkreifgbvkjf2vsdelf3lvdtbkvxb6e6e5o5npack3i43rqnzbw6zffwi"
+//
 const params = () => {
   let hash = location.hash
   if (!hash) return {}
@@ -156,58 +166,67 @@ const params = () => {
   }, {})
 }
 var Params = params()
-const get = (cid) => {
-  return fetch("../fs/" + cid).then((r) => {
-    return r.json()
-  })
-}
-const render = (t) => {
-  let trs = Object.keys(t).map((k) => {
-    if (Array.isArray(t[k])) {
-      return `<tr><td>${k}</td><td>${renderArray(t[k])}</td></tr>`
-    } else {
-      if (typeof t[k] === "object") {
-        return `<tr><td>${k}</td><td>${render(t[k])}</td></tr>`
+
+// NFT data table renderer
+class Table {
+  render (t) {
+    let trs = Object.keys(t).map((k) => {
+      if (Array.isArray(t[k])) {
+        return `<tr><td>${k}</td><td>${this.renderArray(t[k])}</td></tr>`
       } else {
-        return `<tr><td>${k}</td><td>${t[k]}</td></tr>`
+        if (typeof t[k] === "object") {
+          return `<tr><td>${k}</td><td>${this.render(t[k])}</td></tr>`
+        } else {
+          return `<tr><td>${k}</td><td>${t[k]}</td></tr>`
+        }
       }
-    }
-  }).join("")
-  return `<table>${trs}</table>`
-}
-const renderArray = (a) => {
-  if (a.length > 0) {
-    let topKeys = Object.keys(a[0])
-    let header = "<tr>" + topKeys.map((k) => { return `<td>${k}</td>` }).join("") + "</tr>"
-    let body = a.map((item, i) => {
-      return "<tr>" + topKeys.map((key) => {
-        return `<td>${item[key]}</td>`
-      }).join("") + "</tr>"
     }).join("")
-    return "<table>" + header + body + "</table>"
-  } else {
-    return "[ ]"
+    return `<table>${trs}</table>`
+  }
+  renderArray (a) {
+    if (a.length > 0) {
+      let topKeys = Object.keys(a[0])
+      let header = "<tr>" + topKeys.map((k) => { return `<td>${k}</td>` }).join("") + "</tr>"
+      let body = a.map((item, i) => {
+        return "<tr>" + topKeys.map((key) => {
+          return `<td>${item[key]}</td>`
+        }).join("") + "</tr>"
+      }).join("")
+      return "<table>" + header + body + "</table>"
+    } else {
+      return "[ ]"
+    }
+  }
+  renderAttributes (a) {
+    return attributes.map((attribute) => {
+      return `<tr><td>${attribute.trait_type}</td><td>${attribute.value}</td></tr>`
+    }).join("")
   }
 }
-const renderAttributes = (a) => {
-  return attributes.map((attribute) => {
-    return `<tr><td>${attribute.trait_type}</td><td>${attribute.value}</td></tr>`
-  }).join("")
-}
+
+
 document.addEventListener("DOMContentLoaded", async () => {
+  const table = new Table()
+
+  // Init web3 and C0
   const web3 = new Web3(window.ethereum)
   const c0 = new C0()
   try {
     await c0.init({ web3, });
   } catch (e) {
-    document.querySelector(".container").innerHTML = "<h2 class='error'>Please connect to a browser wallet</h2>"
+    document.querySelector(".container").innerHTML = "<h2 class='error'>" + e.message + "</h2>"
   }
 
-
+  // Load the token script and the meetadata
   const [token, meta] = await Promise.all([Params.cid, Params.meta].map((i) => {
-    return get(i)
+    return fetch("../fs/" + i).then((r) => {
+      return r.json()
+    })
   }))
 
+  // Check if the token has an owner on the blockchain
+  // => if exists: it's been minted
+  // => if it doesn't exist => it's not been minted
   let owner
   try {
     owner = await c0.token.methods(token.domain.verifyingContract).ownerOf(token.body.id).call()
@@ -215,8 +234,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("no owner")
   }
 
-  let royalty = await c0.token.methods(token.domain.verifyingContract).royalty(token.body.id).call()
+  //let royalty = await c0.token.methods(token.domain.verifyingContract).royalty(token.body.id).call()
 
+  // Metadata renderer
+  // - animation_url => render <video> or <audio> or <iframe> tags
+  // - image => render <img> tag
   let mime
   let tag
   let src
@@ -238,6 +260,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     src = meta.image
     let cid = meta.image.replace("ipfs://" , "")
     let srcpath = "../fs/" + cid
+
+    // SVGs need to be treated differently because <img> tags don't load SVGs correctly unless their file extension ends with SVG or has a mime type of "image/svg+xml"
+    // The solution to this are:
+    // 1. Explicitly set the mime type to "image/svg+xml"
+    // 2. Use ".svg" file extension
+    // https://stackoverflow.com/questions/58618846/why-i-cannot-show-my-image-svg-that-uploaded-to-s3
+
+    // In our case we have neither options because the SVGs are being loaded from IPFS gateways, which means:
+    // 1. We have no control over the mime types
+    // 2. The file name can't have the ".svg" extension since IPFS files are content addressable
+
+    // THE SOLUTION: Set a "mime" attribute that maps all CIDs referenced in the metadata to its mime types. For example::
+    //
+    //  metadata := {
+    //    name: "nft",
+    //    image: "ipfs://bafkreiakebff6pr4hx3z22yxsknexoc4ljustvoiqvcjcojxznmpn2pbki",
+    //    mime: {
+    //      "bafkreiakebff6pr4hx3z22yxsknexoc4ljustvoiqvcjcojxznmpn2pbki": "iamge/svg+xml"
+    //    }
+    //  }
+    //
     if (meta.mime) {
       mime = meta.mime[cid]
     }
@@ -248,6 +291,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Render the metadata
+  const metaTemplate = Handlebars.compile(document.querySelector("#meta-template").innerHTML)
   document.querySelector("#meta").innerHTML = metaTemplate({
     name: meta.name,
     description: meta.description,
@@ -256,17 +301,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     mainnet: (token.domain.chainId === 1),
     address: token.domain.verifyingContract,
     tokenId: token.body.id,
-    table: render(meta),
+    table: table.render(meta),
     content: tag,
   })
+
+  // If the "owner" exists (if it's already been minted), display the NFT marketplace links
   if (owner) {
     document.querySelector("#owner").classList.remove("hidden")
     document.querySelector("#mint").classList.add("hidden")
   }
-  <% if (config && config.token && config.token.info) { %>
-  document.querySelector("#token").innerHTML = render(token)
-  <% } %>
 
+  // If the mime type is SVG, manually fetch the SVG content and inject the fetched blob into the image tag.
+  // If otherwise, the '<img src="${srcpath}">' tag would have already rendered the image natively.
   if (mime === "image/svg+xml") {
     // SVG is special case scenario
     fetch("../fs/" + src.replace("ipfs://", "")).then((r) => {
@@ -279,8 +325,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
   }
 
-
+  // Mint action handler
   document.querySelector("#mint").addEventListener("click", async (e) => {
+    // If there's a hash puzzle in the token script, display a prompt and ask for the hash puzzle solution before attempting to mint
     let proof = {}
     if (token.body.puzzleHash !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
       let val = prompt("enter the mint puzzle solution")
@@ -289,6 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
     try {
+      // Send the mint transaction
       document.querySelector(".loading").classList.remove("hidden")
       document.querySelector("#mint").classList.add("hidden")
       let tx = await c0.token.send([token], [proof])

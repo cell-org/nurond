@@ -7,6 +7,29 @@
 document.addEventListener("DOMContentLoaded", () => {
   const links = navlinks(location.pathname)
   document.querySelector(".navlinks").innerHTML = links
+  document.querySelector(".list").addEventListener("click", async (e) => {
+    let trashEl = (e.target.closest(".trash") ? e.target.closest(".trash") : (e.target.classList.contains("trash") ? e.target : null))
+    if (trashEl) {
+      e.preventDefault()
+      e.stopPropagation()
+      let path = trashEl.getAttribute("data-path")
+      let workspace = trashEl.getAttribute("data-workspace")
+      let c = confirm("delete?")
+      if (c) {
+        let res = await fetch("/fs/rm2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            workspace,
+            paths: (path === "*" ? "*" : [path])
+          })
+        }).then((res) => {
+          return res.json()
+        })
+        location.href = location.href
+      }
+    }
+  })
 })
 </script>
 </head>
@@ -22,16 +45,22 @@ document.addEventListener("DOMContentLoaded", () => {
 </nav>
 </header>
 <main>
-<div class='list'>
+<div class='files list'>
 <% files.forEach((file) => { %>
   <% if (file.name.endsWith(".html")) { %>
-    <a target="_blank" class='item' href="<%=file.raw%>/<%=file.name%>">
-      <i class="<%=file.icon%>"></i> <%=file.name%>
-    </a>
+    <div class='item'>
+      <a target="_blank" href="<%=file.raw%>/<%=file.name%>">
+        <i class="<%=file.icon%>"></i> <%=file.name%>
+      </a>
+      <button data-workspace="<%=file.workspace%>" data-path="<%=file.path%>" class='trash'><i class="fa-solid fa-trash-can"></i></button>
+    </div>
   <% } else { %>
-    <a class='item' href="<%=file.current%>/<%=file.name%>">
-      <i class="<%=file.icon%>"></i> <%=file.name%>
-    </a>
+    <div class='item'>
+      <a href="<%=file.current%>/<%=file.name%>">
+        <i class="<%=file.icon%>"></i> <%=file.name%>
+      </a>
+      <button data-workspace="<%=file.workspace%>" data-path="<%=file.path%>" class='trash'><i class="fa-solid fa-trash-can"></i></button>
+    </div>
   <% } %>
 <% }) %>
 </div>

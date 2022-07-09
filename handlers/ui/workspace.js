@@ -13,6 +13,8 @@ module.exports = (nuron) => {
         let isFile = file.isFile()
         let isDirectory = file.isDirectory()
         return {
+          workspace: file.name,
+          path: "*",
           current: "/workspaces",
           icon: "fa-solid fa-folder-open",
           name: file.name,
@@ -41,7 +43,12 @@ module.exports = (nuron) => {
         }
         let back = req.params[0].split("/").slice(0, -1).join("/")
         if (filetype === "file") {
+          let chunks = req.params[0].split("/")
+          let workspace = chunks[0]
+          let path = chunks.slice(1).join("/")
           res.render("files/raw", {
+            workspace,
+            current: path,
             name: nuron.core.wallet.name(),
             path: "/workspaces/" + req.params[0],
             back: "/workspaces/" + back,
@@ -55,7 +62,12 @@ module.exports = (nuron) => {
             let isFile = file.isFile()
             let isDirectory = file.isDirectory()
             let type = (isFile ? "file" : (isDirectory ? "directory" : null))
+            let chunks = req.params[0].split("/")
+            let workspace = chunks[0]
+            let path = chunks.slice(1).concat(file.name).join("/")
             return {
+              workspace,
+              path,
               current: "/workspaces/" + req.params[0],
               raw: "/raw/" + req.params[0],
               name: file.name,

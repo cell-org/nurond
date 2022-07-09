@@ -65,7 +65,7 @@ module.exports = (nuron) => {
     })
     stream.pipe(res)
   })
-  nuron.app.post("/uninstall", async (req, res) => {
+  nuron.app.post("/apps/uninstall", async (req, res) => {
     /*
       req.body := {
         git: <git url>,
@@ -84,7 +84,7 @@ module.exports = (nuron) => {
       res.redirect("/")
     }
   })
-  nuron.app.post("/install", async (req, res) => {
+  nuron.app.post("/apps/install", async (req, res) => {
     /*
       req.body := {
         git: <git url>,
@@ -104,7 +104,31 @@ module.exports = (nuron) => {
         depth: 1,
         singleBranch: true
       })
-      res.redirect("/apps")
+      res.json({ success: true })
+    } else {
+      res.redirect("/")
+    }
+  })
+  nuron.app.post("/apps/update", async (req, res) => {
+    /*
+      req.body := {
+        git: <git url>,
+      }
+    */
+    console.log("req.body", req.body)
+    let key = nuron.core.wallet.key()
+    if (key) {
+      // name => hex version of the 
+      let hex = Buffer.from(req.body.git).toString("hex")
+      let appPath = Path.resolve(appRoot, hex)
+      console.log("appPath", appPath)
+      await git.fastForward({
+        fs,
+        http,
+        dir: appPath,
+        singleBranch: true
+      })
+      res.json({ success: true })
     } else {
       res.redirect("/")
     }

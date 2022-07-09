@@ -76,4 +76,17 @@ module.exports = (nuron) => {
     const cid = await nuron.core.fs.write(req.body.workspace, req.file.buffer)
     res.json({ cid })
   })
+  nuron.app.post("/fs/rm2", async (req, res) => {
+    //  req.body := {
+    //    workspace: <workspace>,
+    //    paths: <path array>|<path>|*
+    //  }
+    try {
+      console.log("rm2", req.body)
+      await nuron.core.fs.rm2(req.body.workspace, req.body.paths)
+      res.json({ response: "success" })
+    } catch (e) {
+      res.json({ error: e.toString() })
+    }
+  })
 }

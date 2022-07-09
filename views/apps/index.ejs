@@ -10,19 +10,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".list").addEventListener("click", async (e) => {
 
     // get the data-hex
-    let btn = (e.target.classList.contains("del")) ? e.target : e.target.closest(".del")
-    if (btn) {
+    let del_btn = (e.target.classList.contains("del")) ? e.target : e.target.closest(".del")
+    if (del_btn) {
       e.preventDefault()
       e.stopPropagation()
       let c = confirm("this will delete the app from nuron. continue?")
       if (c) {
-        let res = await fetch("/uninstall", {
+        let res = await fetch("/apps/uninstall", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            git: btn.getAttribute("data-url")
+            git: del_btn.getAttribute("data-url")
           })
         }).then((res) => {
           return res.json()
@@ -30,7 +30,27 @@ document.addEventListener("DOMContentLoaded", () => {
         location.reload()
       }
     }
-
+    let update_btn = (e.target.classList.contains("update")) ? e.target : e.target.closest(".update")
+    if (update_btn) {
+      document.querySelector(".update i").classList.add("fa-spin")
+      e.preventDefault()
+      e.stopPropagation()
+      let c = confirm("update to the latest version?")
+      if (c) {
+        let res = await fetch("/apps/update", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            git: update_btn.getAttribute("data-url")
+          })
+        }).then((res) => {
+          return res.json()
+        })
+        location.reload()
+      }
+    }
   })
 })
 </script>
@@ -52,14 +72,15 @@ document.addEventListener("DOMContentLoaded", () => {
   <div>Install offline websites to Nuron.</div>
   <a class='btn' href="/install">+ Install</a>
 </div>
-<div class='list'>
+<div class='list apps'>
 <% apps.forEach((app) => { %>
   <div class='item'>
-    <h3><i class='fa-solid fa-gamepad'></i> <%=app.hex%></h3>
-    <div class='l'><%=app.original%></div>
+    <h3><i class='fa-solid fa-gamepad'></i> <%=app.original%></h3>
+    <div class='l'><%=app.hex%></div>
     <div class='actions'>
       <a target="_blank" class='action-btn' href="/apps/<%=app.hex%>/index.html"><i class="fa-solid fa-power-off"></i> Open</a>
       <div class='flexible'></div>
+      <button data-url="<%=app.original%>" class='action-btn update'><i class="fa-solid fa-arrows-rotate"></i> update</button>
       <button data-url="<%=app.original%>" class='action-btn warning del'><i class="fa-solid fa-trash-can"></i> delete</button>
     </div>
   </div>
