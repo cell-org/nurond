@@ -459,3 +459,31 @@ h3 {
   background: rgba(255,255,255,0.1);
   box-sizing: border-box;
 }
+.connector {
+  margin-bottom: 50px;
+  background: rgba(0,0,0,0.1);
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.connector button, .connector .btn {
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 2px;
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.8);
+  background: none;
+  margin-top: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.connector button:hover, .connector .btn:hover {
+  color: royalblue;
+  border-color: royalblue;
+}
+.connector h5 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+}

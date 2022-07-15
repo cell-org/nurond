@@ -1,6 +1,7 @@
 <html>
 <head>
 <script src="/nice-select2.js"></script>
+<script src="/privateparty.js"></script>
 <link href="/nice-select2.css" rel="stylesheet">
 <link href="/style.css" rel="stylesheet">
 <script>
@@ -37,11 +38,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       location.reload()
     })
   })
+  <% if (adminEnabled) { %>
+  const party = new Privateparty()
+  document.querySelector("#logout").addEventListener("click", async (e) => {
+    await party.disconnect("admin")
+    location.href = location.href
+  })
+  <% } %>
 })
 </script>
 </head>
 <body class='center'>
 <main class='compact'>
+<% if (adminEnabled) { %>
+<div class='connector'>
+  <h5>logged in as admin</h5>
+  <div>
+    <button id='logout'>Disconnect</button>
+    <a class='btn' href="/privateparty/admin">Admin</a>
+  </div>
+</div>
+<% } %>
 <h1 id='logo'><a href="/"><img class='logo' src="nuron.png"></a></h1>
 <br><br>
 <form>
@@ -53,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   </select>
   <input id='username' type='username' placeholder='username' disabled class='hidden'>
   <input id='password' type='password' placeholder='enter decryption password'>
-  <input type='submit' value='connect'>
+  <input type='submit' value='select'>
   <br>
   <a href="/wallet/generate">generate a wallet</a>
   <a href="/wallet/import">import a wallet</a>
