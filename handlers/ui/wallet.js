@@ -18,10 +18,8 @@ module.exports = (nuron) => {
     }
   })
   nuron.app.get("/wallets/:chainId", async (req, res) => {
-    console.log("wallets chainid", req.params.chainId)
     let c = await nuron.core.wallet.get(req.params.chainId)
     if (c) {
-      console.log("c", c)
       res.render("wallet/chain", { name: nuron.core.wallet.name(), chain_name: c.chain.name, chain: c.chain.chain, chainId: c.chain.chainId, chains: c.accounts })
     } else {
       res.redirect("/")

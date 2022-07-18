@@ -7,7 +7,6 @@ module.exports = (nuron) => {
       res.render("view/home", { name: nuron.core.wallet.name(), chainId: req.params.chainId, adminEnabled })
     } else {
       let wallets = await nuron.core.wallet.get()
-      console.log("Wallets", wallets)
       res.render("wallet/loggedout", { wallets, adminEnabled })
     }
   })

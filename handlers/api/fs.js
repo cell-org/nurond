@@ -40,7 +40,6 @@ module.exports = (nuron) => {
       delete nuron.progress.fs[req.body.workspace]
       res.json({ response: r })
     } catch (e) {
-      console.log("ERROR", e)
       res.status(500).json({ error: e.message })
     }
   })
@@ -71,8 +70,6 @@ module.exports = (nuron) => {
     //  req.file := {
     //    buffer: <buffer>
     //  }
-    console.log("req.file.buffer", req.file.buffer)
-    console.log("req.body", req.body)
     const cid = await nuron.core.fs.write(req.body.workspace, req.file.buffer)
     res.json({ cid })
   })
@@ -82,7 +79,6 @@ module.exports = (nuron) => {
     //    paths: <path array>|<path>|*
     //  }
     try {
-      console.log("rm2", req.body)
       await nuron.core.fs.rm2(req.body.workspace, req.body.paths)
       res.json({ response: "success" })
     } catch (e) {

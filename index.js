@@ -88,8 +88,6 @@ class Nuron {
     // Initialize App
     this.app = express()
     this.port = options && options.port ? options.port : 42000
-//    this.app.use(cors(Config.cors))
-//    this.app.options('*', cors(Config.cors))
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(express.json())
     this.app.set('view engine', 'ejs');
@@ -110,6 +108,7 @@ class Nuron {
         res.status(404).json({ error: "not found" })
       }
     })
+    this.admins = options.admins
 
     // Provide admin UI for admins
     this.party = new Privateparty({
@@ -118,37 +117,13 @@ class Nuron {
       cors: options.cors
     })
 
-
+    // Run beforeAuth plugin => all the logic to run before protecting routes
     let protector = (options.beforeAuth ? options.beforeAuth(this.party) : {})
-    this.admins = options.admins
 
-//    let protector = {}
-//    if (options.admins) {
-//      this.admins = options.admins
-//      this.party.add("admin", {
-//        authorize: async (req, account) => {
-//          // only allow admins to use
-//          for(let admin of this.admins) {
-//            if (account === admin.toLowerCase()) {
-//              return { authorized: true }
-//            }
-//          }
-//          throw new Error("not an admin account")
-//        }
-//      })
-//      protector.cookie = "admin"
-//    }
-//
-//    // Token authentication
-//    if (options.tokens) {
-//      this.party.add("api", { tokens: options.tokens })
-//      protector.token = "api"
-//    }
-
-
-    // Protect
+    // All route handlers are protected with auth from this point below
     if (Object.keys(protector).length > 0) this.app.use(this.party.protect(protector))
 
+    // Run afterAuth plugin => all the injected route handlers on top of Nuron
     if (options.afterAuth) options.afterAuth(this.party) 
 
     // API handlers

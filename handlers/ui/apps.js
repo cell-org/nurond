@@ -5,7 +5,6 @@ const fs = require('fs')
 const paths = {}
 module.exports = (nuron) => {
   const appRoot = Path.resolve(nuron.path, "apps")
-  console.log("app root", appRoot)
   fs.promises.mkdir(appRoot, { recursive: true }).catch((e) => { })
   nuron.app.get("/install", async (req, res) => {
     res.render("apps/show", {
@@ -32,7 +31,6 @@ module.exports = (nuron) => {
     }
   })
   nuron.app.get("/apps/*", async (req, res) => {
-    console.log("params", req.params[0])
     let appNameHex = req.params[0].split("/")[0]
     let appName = Buffer.from(appNameHex, "hex").toString()
     let nuronJSONpath = Path.resolve(appRoot, appNameHex, "nuron.json")
@@ -43,22 +41,18 @@ module.exports = (nuron) => {
       try {
         let nuronConfigStr = await fs.promises.readFile(nuronJSONpath, "utf8")
         let nuronConfig = JSON.parse(nuronConfigStr)
-        console.log("nuronConfig", nuronConfig)
         if (nuronConfig.path) {
           appPath = Path.resolve(appRoot, appNameHex, nuronConfig.path)
         } else {
           appPath = Path.resolve(appRoot, appNameHex)
         }
       } catch (e) {
-        console.log("Error", e)
         appPath = Path.resolve(appRoot, appNameHex)
       }
       paths[appNameHex] = appPath
     }
 
     let filePath = Path.resolve(appPath, req.params[0].split("/").slice(1).join("/"))
-
-    console.log("filePath", filePath)
     let stream = fs.createReadStream(filePath)
     stream.on("error", (e) => {
       res.status(500).json({ error: e.message })
@@ -73,11 +67,9 @@ module.exports = (nuron) => {
     */
     let key = nuron.core.wallet.key()
     if (key) {
-      console.log("uninstall", req.body)
       // name => hex version of the 
       let hex = Buffer.from(req.body.git).toString("hex")
       let appPath = Path.resolve(appRoot, hex)
-      console.log("delete", appPath)
       await fs.promises.rm(appPath, { recursive: true })
       res.json({})
     } else {
@@ -90,7 +82,6 @@ module.exports = (nuron) => {
         git: <git url>,
       }
     */
-    console.log("req.body", req.body)
     let key = nuron.core.wallet.key()
     if (key) {
       // name => hex version of the 
@@ -115,13 +106,11 @@ module.exports = (nuron) => {
         git: <git url>,
       }
     */
-    console.log("req.body", req.body)
     let key = nuron.core.wallet.key()
     if (key) {
       // name => hex version of the 
       let hex = Buffer.from(req.body.git).toString("hex")
       let appPath = Path.resolve(appRoot, hex)
-      console.log("appPath", appPath)
       await git.fastForward({
         fs,
         http,
