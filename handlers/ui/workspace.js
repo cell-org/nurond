@@ -76,6 +76,12 @@ module.exports = (nuron) => {
             }
           })
 
+          let chunks = req.params[0].split("/")
+          let published = null
+          if(chunks.length === 2 && chunks[1] === "published") {
+            published = `/collections/${chunks[0]}/web/index.html`
+          }
+
           res.render("files/list", {
             name: nuron.core.wallet.name(),
             filepath: filePath,
@@ -83,6 +89,7 @@ module.exports = (nuron) => {
             back: "/workspaces/" + back,
             files,
             view: false,
+            published
           })
         }
       } catch (e) {

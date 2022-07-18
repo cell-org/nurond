@@ -74,7 +74,6 @@ class Nuron {
     this.workspacepath = path.join(this.path, "workspace")
     this.config = await this.getConfig()
     this.web3 = new Web3()
-    console.log("this.config", this.config)
 
     // Initialize Core
     let initializer = {
@@ -96,6 +95,21 @@ class Nuron {
     this.app.set('view engine', 'ejs');
     this.app.set('views', path.join(__dirname, 'views'));
     this.app.use(express.static(path.join(__dirname, 'public')))
+
+    this.app.get("/collections/*", (req, res) => {
+      let chunks = req.params[0].split("/")
+      chunks.splice(1, 0, "published")
+      let filePath = path.join(this.core.path, chunks.join("/"))
+      try {
+        let stream = fs.createReadStream(filePath)
+        stream.on("error", (e) => {
+          res.status(404).json({ error: "not found" })
+        })
+        stream.pipe(res)
+      } catch (e) {
+        res.status(404).json({ error: "not found" })
+      }
+    })
 
     // Provide admin UI for admins
     this.party = new Privateparty({

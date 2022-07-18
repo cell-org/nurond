@@ -45,6 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
 </nav>
 </header>
 <main>
+<% if (locals.published) { %>
+<div>
+  <a href="<%=published%>" target="_blank" class='btn'>View published collection</a>
+</div>
+<% } %>
 <div class='files list'>
 <% files.forEach((file) => { %>
   <% if (file.name.endsWith(".html")) { %>

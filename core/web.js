@@ -8,7 +8,29 @@ class Web {
   constructor(core) {
     this.core = core
   }
+  async publish(o) {
+    // create a 'published' folder
+    const workspacePath = Path.resolve(this.core.path, o.workspace)
+    const publishedPath = Path.resolve(workspacePath, "published")
+    let e = await exists(publishedPath)
+    if (!e) {
+      await fs.promises.mkdir(publishedPath, { recursive: true }).catch((e) => {})
+    }
+    // copy db, fs, web into published
+    const fsPath = Path.resolve(workspacePath, "fs")
+    const dbPath = Path.resolve(workspacePath, "db")
+    const webPath = Path.resolve(workspacePath, "web")
+
+    const fsDestPath = Path.resolve(workspacePath, "published", "fs")
+    const dbDestPath = Path.resolve(workspacePath, "published", "db")
+    const webDestPath = Path.resolve(workspacePath, "published", "web")
+
+    await fs.promises.cp(fsPath, fsDestPath, { recursive: true })
+    await fs.promises.cp(dbPath, dbDestPath, { recursive: true })
+    await fs.promises.cp(webPath, webDestPath, { recursive: true })
+  }
   async build(o) {
+    console.log("build", o)
     //  o := {
     //    templates: [{
     //      src: <index.ejs url>,

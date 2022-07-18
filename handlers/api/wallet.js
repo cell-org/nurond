@@ -55,7 +55,6 @@ module.exports = (nuron) => {
 
   // 2. WALLET API - POST
   nuron.app.post("/wallet/connect", async (req, res) => {
-    console.log("connect req", req.body)
     try {
       await nuron.core.wallet.connect(req.body.password, req.body.username)
       res.json({ success: true })
@@ -72,7 +71,6 @@ module.exports = (nuron) => {
     }
   })
   nuron.app.post("/wallet/delete", async (req, res) => {
-    console.log("delete req", req.body)
     try {
       await nuron.core.wallet.delete(req.body.password)
       res.json({ success: true })

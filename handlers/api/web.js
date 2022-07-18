@@ -21,4 +21,17 @@ module.exports = (nuron) => {
       res.status(500).json({ error: e.message })
     }
   })
+  nuron.app.post("/web/publish", async (req, res) => {
+    //  req.body := {
+    //    workspace: <workspace path>,
+    //    path:   <file path>,
+    //  }
+    try {
+      req.body.path = "published"
+      await nuron.core.web.publish(req.body)
+      res.json({ success: true })
+    } catch (e) {
+      res.status(500).json({ error: e.message })
+    }
+  })
 }
