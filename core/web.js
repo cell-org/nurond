@@ -78,10 +78,6 @@ class Web {
       }
 
       await fs.promises.writeFile(Path.resolve(this.core.path, o.workspace, o.path, template.dest), html).catch((e) => {})
-//      await fs.promises.copyFile(
-//        __dirname + "/templates/c0.js",
-//        Path.resolve(this.core.path, o.workspace, o.path, "c0.js")
-//      )
 
     }
 

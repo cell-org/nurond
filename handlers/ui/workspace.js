@@ -82,6 +82,11 @@ module.exports = (nuron) => {
             published = `/collections/${chunks[0]}/web/index.html`
           }
 
+          let download = null
+          if (chunks.length === 1) {
+            download = `/workspace/download?workspace=${chunks[0]}`
+          }
+
           res.render("files/list", {
             name: nuron.core.wallet.name(),
             filepath: filePath,
@@ -89,7 +94,8 @@ module.exports = (nuron) => {
             back: "/workspaces/" + back,
             files,
             view: false,
-            published
+            published,
+            download
           })
         }
       } catch (e) {
