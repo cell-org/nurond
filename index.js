@@ -141,6 +141,7 @@ class Nuron {
     Handlers.ui.apps(this)
 
     this.server = this.app.listen(this.port)
+    console.log("nurond running at http://localhost:42000")
   }
   stop() {
     this.server.close()
