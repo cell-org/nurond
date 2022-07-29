@@ -20,7 +20,7 @@ class Core {
     this.web = new Web(this)
     this.wallet = new Wallet(this)
     this.db = new DB(this)
-    this.wallet.keyport.on("connect", () => {
+    this.wallet.keyport.on("disconnect", () => {
       this.token.disconnect()
     })
     try {
