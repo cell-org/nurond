@@ -1,3 +1,12 @@
+const path = require('path')
+const workspace = (req) => {
+  if (req.session && Object.keys(req.session).length > 0) {
+    let key = Object.keys(req.session)
+    return path.join(req.session[key].account, req.body.workspace)
+  } else {
+    return req.body.workspace
+  }
+}
 module.exports = (nuron) => {
   nuron.app.post("/web/build", async (req, res) => {
     //  req.body := {
@@ -15,6 +24,7 @@ module.exports = (nuron) => {
     //  }
     try {
       req.body.path = "web"
+      req.body.workspace = workspace(req)
       await nuron.core.web.build(req.body)
       res.json({ success: true })
     } catch (e) {
@@ -28,6 +38,7 @@ module.exports = (nuron) => {
     //  }
     try {
       req.body.path = "published"
+      req.body.workspace = workspace(req)
       await nuron.core.web.publish(req.body)
       res.json({ success: true })
     } catch (e) {

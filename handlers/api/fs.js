@@ -1,6 +1,14 @@
 const fs = require('fs')
 const path = require('path')
 const multer  = require('multer')
+const workspace = (req) => {
+  if (req.session && Object.keys(req.session).length > 0) {
+    let key = Object.keys(req.session)
+    return path.join(req.session[key].account, req.body.workspace)
+  } else {
+    return req.body.workspace
+  }
+}
 module.exports = (nuron) => {
   const storage = multer.memoryStorage()
   const upload = multer({ storage: storage })
@@ -20,8 +28,9 @@ module.exports = (nuron) => {
     //  req.body := {
     //    workscpace: <workspace>fs namespace>,
     //  }
-    if (nuron.progress.fs[req.body.workspace]) {
-      res.json(nuron.progress.fs[req.body.workspace])
+    const ws = workspace(req)
+    if (nuron.progress.fs[ws]) {
+      res.json(nuron.progress.fs[ws])
     } else {
       res.json({})
     }
@@ -32,12 +41,13 @@ module.exports = (nuron) => {
     //    cid: <cid>
     //  }
     try {
-      let r = await nuron.core.fs.pin(req.body.workspace, req.body.cid, (total, completed) => {
-        nuron.progress.fs[req.body.workspace] = {
+      const ws = workspace(req)
+      let r = await nuron.core.fs.pin(ws, req.body.cid, (total, completed) => {
+        nuron.progress.fs[ws] = {
           total, completed
         }
       })
-      delete nuron.progress.fs[req.body.workspace]
+      delete nuron.progress.fs[ws]
       res.json({ response: r })
     } catch (e) {
       res.status(500).json({ error: e.message })
@@ -49,7 +59,8 @@ module.exports = (nuron) => {
     //    cids: <cid array>|<cid>|*
     //  }
     try {
-      await nuron.core.fs.rm(req.body.workspace, req.body.cids)
+      const ws = workspace(req)
+      await nuron.core.fs.rm(ws, req.body.cids)
       res.json({ response: "success" })
     } catch (e) {
       res.json({ error: e.toString() })
@@ -60,7 +71,8 @@ module.exports = (nuron) => {
     //    workspace: <workspace path>,
     //    body: <JSON body>
     //  }
-    const cid = await nuron.core.fs.write(req.body.workspace, req.body.body)
+    const ws = workspace(req)
+    const cid = await nuron.core.fs.write(ws, req.body.body)
     res.json({ cid })
   })
   nuron.app.post("/fs/binary", upload.single("file"), async (req, res) => {
@@ -70,7 +82,8 @@ module.exports = (nuron) => {
     //  req.file := {
     //    buffer: <buffer>
     //  }
-    const cid = await nuron.core.fs.write(req.body.workspace, req.file.buffer)
+    const ws = workspace(req)
+    const cid = await nuron.core.fs.write(ws, req.file.buffer)
     res.json({ cid })
   })
   nuron.app.post("/fs/rm2", async (req, res) => {
@@ -79,7 +92,8 @@ module.exports = (nuron) => {
     //    paths: <path array>|<path>|*
     //  }
     try {
-      await nuron.core.fs.rm2(req.body.workspace, req.body.paths)
+      const ws = workspace(req)
+      await nuron.core.fs.rm2(ws, req.body.paths)
       res.json({ response: "success" })
     } catch (e) {
       res.json({ error: e.toString() })

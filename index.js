@@ -118,13 +118,10 @@ class Nuron {
     })
 
     // Run beforeAuth plugin => all the logic to run before protecting routes
-    let protector = (options.beforeAuth ? options.beforeAuth(this.party) : {})
+    if (options.beforeInit) {
+      await options.beforeInit(this.party)
+    }
 
-    // All route handlers are protected with auth from this point below
-    if (Object.keys(protector).length > 0) this.app.use(this.party.protect(protector))
-
-    // Run afterAuth plugin => all the injected route handlers on top of Nuron
-    if (options.afterAuth) options.afterAuth(this.party) 
 
     // API handlers
     Handlers.api.fs(this)

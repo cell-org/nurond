@@ -30,7 +30,6 @@ class Web {
     await fs.promises.cp(webPath, webDestPath, { recursive: true })
   }
   async build(o) {
-    console.log("build", o)
     //  o := {
     //    templates: [{
     //      src: <index.ejs url>,

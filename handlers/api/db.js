@@ -1,3 +1,12 @@
+const path = require('path')
+const workspace = (req) => {
+  if (req.session && Object.keys(req.session).length > 0) {
+    let key = Object.keys(req.session)
+    return path.join(req.session[key].account, req.body.workspace)
+  } else {
+    return req.body.workspace
+  }
+}
 module.exports = (nuron) => {
   nuron.app.post("/db/write", async (req, res) => {
     //  req.body := {
@@ -6,7 +15,8 @@ module.exports = (nuron) => {
     //    payload: <token>
     //  }
     try {
-      await nuron.core.db.write(req.body.workspace, req.body.table, req.body.payload)
+      const ws = workspace(req)
+      await nuron.core.db.write(ws, req.body.table, req.body.payload)
       res.json({ success: true })
     } catch (e) {
       res.status(500).json({ error: e.message })
@@ -19,7 +29,8 @@ module.exports = (nuron) => {
     //    payload: <query>
     //  }
     try {
-      let response = await nuron.core.db.read(req.body.workspace, req.body.table, req.body.payload)
+      const ws = workspace(req)
+      let response = await nuron.core.db.read(ws, req.body.table, req.body.payload)
       res.json({ response })
     } catch (e) {
       res.status(500).json({ error: e.message })
@@ -32,7 +43,8 @@ module.exports = (nuron) => {
     //    payload: <query>
     //  }
     try {
-      let response = await nuron.core.db.readOne(req.body.workspace, req.body.table, req.body.payload)
+      const ws = workspace(req)
+      let response = await nuron.core.db.readOne(ws, req.body.table, req.body.payload)
       res.json({ response })
     } catch (e) {
       res.status(500).json({ error: e.message })
@@ -44,9 +56,9 @@ module.exports = (nuron) => {
     //    table: <table name>,
     //    payload: <query>
     //  }
-    console.log("/db/rm", req.body)
     try {
-      let response = await nuron.core.db.rm(req.body.workspace, req.body.table, req.body.payload)
+      const ws = workspace(req)
+      let response = await nuron.core.db.rm(ws, req.body.table, req.body.payload)
       res.json({ success: true })
     } catch (e) {
       res.status(500).json({ error: e.message })

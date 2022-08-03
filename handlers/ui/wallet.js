@@ -17,6 +17,12 @@ module.exports = (nuron) => {
       res.redirect("/")
     }
   })
+  nuron.app.get("/wallets/generate", async (req, res) => {
+    res.render("wallet/generate")
+  })
+  nuron.app.get("/wallets/import", async (req, res) => {
+    res.render("wallet/import")
+  })
   nuron.app.get("/wallets/:chainId", async (req, res) => {
     let c = await nuron.core.wallet.get(req.params.chainId)
     if (c) {
@@ -24,11 +30,5 @@ module.exports = (nuron) => {
     } else {
       res.redirect("/")
     }
-  })
-  nuron.app.get("/wallet/generate", async (req, res) => {
-    res.render("wallet/generate")
-  })
-  nuron.app.get("/wallet/import", async (req, res) => {
-    res.render("wallet/import")
   })
 }
